@@ -1,0 +1,56 @@
+name: Deploy Apps
+
+on:
+  push:
+    branches:
+      - main # Deploy on push to main branch
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18' # Or a version compatible with your project
+          cache: 'npm'
+
+      # Build API
+      - name: Build API
+        run: |
+          cd apps/api
+          npm ci
+          npm run build
+        env:
+          NODE_ENV: production
+
+      # Build Frontend
+      - name: Build Frontend
+        run: |
+          cd apps/web
+          npm ci
+          npm run build
+        env:
+          NODE_ENV: production
+
+      # Placeholder for deployment steps. Actual deployment requires platform-specific actions/secrets.
+      # Example for Render (API):
+      # - name: Deploy API to Render
+      #   uses: some-render-deploy-action@v1
+      #   with:
+      #     api_key: ${{ secrets.RENDER_API_KEY }}
+      #     service_id: YOUR_API_SERVICE_ID
+
+      # Example for Vercel (Frontend):
+      # - name: Deploy Frontend to Vercel
+      #   uses: amondnet/vercel-action@v2
+      #   with:
+      #     vercel_org_id: ${{ secrets.VERCEL_ORG_ID }}
+      #     vercel_project_id: ${{ secrets.VERCEL_PROJECT_ID }}
+      #     vercel_token: ${{ secrets.VERCEL_TOKEN }}
+
+      - name: Notify completion (Placeholder)
+        run: echo "Build and deployment steps (placeholders) completed."
