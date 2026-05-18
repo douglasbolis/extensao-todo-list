@@ -24,11 +24,11 @@ O desenvolvimento seguirá de forma estrita o fluxo Spec-Driven Development. O m
 
 ## Fase 3: Front-end (View & Integração)
 
-- [ ] T008 [P] Inicializar projeto React + Vite + TypeScript + TailwindCSS em `/apps/web`.
-- [ ] T009 [P] Criar serviço de API base integrado ao back-end local do monorepo.
-- [ ] T010 Criar componentes de UI mobile-first: Formulário de cadastro (com seletor de data/hora para lembrete), Listagem de tarefas e Card de Alerta de Lembrete Ativo.
-- [ ] T011 Implementar lógica para checar lembretes ativos em background (via setInterval simples na View ou Notification API).
-- [ ] T012 [P] Criar testes unitários e de comportamento (Vitest + Testing Library) para os fluxos da View.
+- [X] T008 [P] Inicializar projeto React + Vite + TypeScript + TailwindCSS em `/apps/web`.
+- [X] T009 [P] Criar serviço de API base integrado ao back-end local do monorepo.
+- [X] T010 Criar componentes de UI mobile-first: Formulário de cadastro (com seletor de data/hora para lembrete), Listagem de tarefas e Card de Alerta de Lembrete Ativo.
+- [X] T011 Implementar lógica para checar lembretes ativos em background (via setInterval simples na View ou Notification API).
+- [X] T012 [P] Criar testes unitários e de comportamento (Vitest + Testing Library) para os fluxos da View.
 
 ---
 

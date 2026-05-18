@@ -2,11 +2,14 @@
   "name": "extensao-todo-list",
   "version": "1.0.0",
   "description": "Todo-List usando Spec-Driven Development e Arquitetura MVC",
+  "workspaces": [
+    "apps/*"
+  ],
   "scripts": {
     "install:api": "npm install --prefix apps/api",
     "install:web": "npm install --prefix apps/web",
     "install:all": "npm install --prefix apps/api && npm install --prefix apps/web",
-    "dev:api": "npm run dev --workspace=apps/api",
+    "dev:api": "npm run dev -w apps/api",
     "dev:web": "npm run dev --workspace=apps/web",
     "build": "npm run build --workspaces --if-present",
     "test": "npm run test --workspaces --if-present"

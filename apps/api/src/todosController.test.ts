@@ -1,7 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { Request, Response } from 'express'
+import request from 'supertest'
+import express from 'express'
 import todosController from './controllers/todosController'
 import todoStore, { TodoTask } from './models/TodoStore'
+
+// Setup do app Express apenas para os testes
+const app = express()
+app.use(express.json())
+app.use('/api/todos', todosController)
 
 // Mock the todoStore and its methods
 vi.mock('./models/TodoStore')
@@ -12,29 +18,11 @@ const mockedTodoStore = todoStore as unknown as {
   toggleTaskCompletion: (id: string) => TodoTask | undefined;
 };
 
-// Mock Request and Response objects
-const mockRequest = (body: any = {}, params: any = {}, query: any = {}) => ({
-  body,
-  params,
-  query
-}) as Request;
-
-const mockResponse = () => {
-  const res = {} as Response;
-  res.json = vi.fn().mockReturnValue(res);
-  res.status = vi.fn().mockReturnValue(res);
-  res.send = vi.fn().mockReturnValue(res);
-  res.sendStatus = vi.fn().mockReturnValue(res);
-  return res;
-};
-
 describe('Todos Controller', () => {
   beforeEach(() => {
-    // Reset mocks before each test
     vi.clearAllMocks()
   })
 
-  // --- GET /api/todos ---
   describe('GET /api/todos', () => {
     it('should return all tasks', async () => {
       const mockTasks: TodoTask[] = [
@@ -43,33 +31,36 @@ describe('Todos Controller', () => {
       ]
       vi.spyOn(mockedTodoStore, 'getAllTasks').mockReturnValue(mockTasks);
 
-      const req = mockRequest()
-      const res = mockResponse()
-
-      // Força o TypeScript a ignorar a assinatura estrita do Router do Express
-      await (todosController as any).get(req, res);
+      const response = await request(app).get('/api/todos')
 
       expect(mockedTodoStore.getAllTasks).toHaveBeenCalledTimes(1);
-      expect(res.json).toHaveBeenCalledWith(mockTasks);
-      expect(res.status).not.toHaveBeenCalled(); // Default status is 200
+      expect(response.status).toBe(200);
+      
+      // Datas podem vir como string no JSON
+      const expectedTasks = mockTasks.map(t => ({
+        ...t,
+        createdAt: t.createdAt.toISOString(),
+        reminderAt: t.reminderAt ? t.reminderAt.toISOString() : undefined
+      }));
+      expect(response.body).toEqual(expectedTasks);
     })
   })
 
-  // --- POST /api/todos ---
   describe('POST /api/todos', () => {
     it('should create a new task successfully', async () => {
       const newTask: TodoTask = { id: 'mock-uuid-123', title: 'New Task', completed: false, createdAt: new Date(), hasReminderActive: false };
       vi.spyOn(mockedTodoStore, 'addTask').mockReturnValue(newTask);
 
-      const req = mockRequest({ title: 'New Task' })
-      const res = mockResponse()
-
-      // Força o TypeScript a ignorar a assinatura estrita do Router do Express
-      await (todosController as any).post(req, res);
+      const response = await request(app)
+        .post('/api/todos')
+        .send({ title: 'New Task' })
 
       expect(mockedTodoStore.addTask).toHaveBeenCalledWith('New Task', undefined);
-      expect(res.status).toHaveBeenCalledWith(201);
-      expect(res.json).toHaveBeenCalledWith(newTask);
+      expect(response.status).toBe(201);
+      expect(response.body).toEqual({
+        ...newTask,
+        createdAt: newTask.createdAt.toISOString()
+      });
     })
 
     it('should create a task with a reminder', async () => {
@@ -77,103 +68,80 @@ describe('Todos Controller', () => {
       const newTask: TodoTask = { id: 'mock-uuid-123', title: 'Task with Reminder', completed: false, createdAt: new Date(), reminderAt: reminderDate, hasReminderActive: false };
       vi.spyOn(mockedTodoStore, 'addTask').mockReturnValue(newTask);
 
-      const req = mockRequest({ title: 'Task with Reminder', reminderAt: reminderDate.toISOString() })
-      const res = mockResponse()
-
-      // Força o TypeScript a ignorar a assinatura estrita do Router do Express
-      await (todosController as any).post(req, res);
+      const response = await request(app)
+        .post('/api/todos')
+        .send({ title: 'Task with Reminder', reminderAt: reminderDate.toISOString() })
 
       expect(mockedTodoStore.addTask).toHaveBeenCalledWith('Task with Reminder', expect.any(Date));
-      expect(res.status).toHaveBeenCalledWith(201);
-      expect(res.json).toHaveBeenCalledWith(newTask);
+      expect(response.status).toBe(201);
     })
 
     it('should return 400 if title is missing or empty', async () => {
-      const req1 = mockRequest({ reminderAt: new Date().toISOString() });
-      const res1 = mockResponse();
-      // Força o TypeScript a ignorar a assinatura estrita do Router do Express
-      await (todosController as any).post(req1, res1);
-      expect(res1.status).toHaveBeenCalledWith(400);
-      expect(res1.json).toHaveBeenCalledWith({ message: 'Task title is required.' });
+      const response1 = await request(app).post('/api/todos').send({ reminderAt: new Date().toISOString() })
+      expect(response1.status).toBe(400);
+      expect(response1.body).toEqual({ message: 'Task title is required.' });
 
-      const req2 = mockRequest({ title: '   ', reminderAt: new Date().toISOString() });
-      const res2 = mockResponse();
-      // Força o TypeScript a ignorar a assinatura estrita do Router do Express
-      await (todosController as any).post(req2, res2);
-      expect(res2.status).toHaveBeenCalledWith(400);
-      expect(res2.json).toHaveBeenCalledWith({ message: 'Task title is required.' });
+      const response2 = await request(app).post('/api/todos').send({ title: '   ', reminderAt: new Date().toISOString() })
+      expect(response2.status).toBe(400);
+      expect(response2.body).toEqual({ message: 'Task title is required.' });
     })
     
     it('should return 400 for invalid reminder date format', async () => {
-      const req = mockRequest({ title: 'Invalid Date Task', reminderAt: 'not-a-date' });
-      const res = mockResponse();
-      // Força o TypeScript a ignorar a assinatura estrita do Router do Express
-      await (todosController as any).post(req, res);
-      expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.json).toHaveBeenCalledWith({ message: 'Invalid reminder date format. Use ISO string.' });
+      const response = await request(app).post('/api/todos').send({ title: 'Invalid Date Task', reminderAt: 'not-a-date' })
+      expect(response.status).toBe(400);
+      expect(response.body).toEqual({ message: 'Invalid reminder date format. Use ISO string.' });
     })
     
     it('should return 400 if addTask throws an error', async () => {
       vi.spyOn(mockedTodoStore, 'addTask').mockImplementation(() => {
         throw new Error('Failed to add task');
       });
-      const req = mockRequest({ title: 'Task that fails adding' });
-      const res = mockResponse();
-      // Força o TypeScript a ignorar a assinatura estrita do Router do Express
-      await (todosController as any).post(req, res);
-      expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.json).toHaveBeenCalledWith({ message: 'Failed to add task' });
+      const response = await request(app).post('/api/todos').send({ title: 'Task that fails adding' })
+      expect(response.status).toBe(400);
+      expect(response.body).toEqual({ message: 'Failed to add task' });
     });
   })
 
-  // --- DELETE /api/todos/:id ---
   describe('DELETE /api/todos/:id', () => {
     it('should delete a task successfully', async () => {
       vi.spyOn(mockedTodoStore, 'deleteTask').mockReturnValue(true);
-      const req = mockRequest({}, { id: 'task-id-to-delete' });
-      const res = mockResponse();
-      // Força o TypeScript a ignorar a assinatura estrita do Router do Express
-      await (todosController as any).delete(req, res);
+      const response = await request(app).delete('/api/todos/task-id-to-delete')
       expect(mockedTodoStore.deleteTask).toHaveBeenCalledWith('task-id-to-delete');
-      expect(res.status).toHaveBeenCalledWith(204);
-      expect(res.send).toHaveBeenCalled();
+      expect(response.status).toBe(204);
     })
 
     it('should return 404 if task is not found', async () => {
       vi.spyOn(mockedTodoStore, 'deleteTask').mockReturnValue(false);
-      const req = mockRequest({}, { id: 'non-existent-id' });
-      const res = mockResponse();
-      // Força o TypeScript a ignorar a assinatura estrita do Router do Express
-      await (todosController as any).delete(req, res);
+      const response = await request(app).delete('/api/todos/non-existent-id')
       expect(mockedTodoStore.deleteTask).toHaveBeenCalledWith('non-existent-id');
-      expect(res.status).toHaveBeenCalledWith(404);
-      expect(res.json).toHaveBeenCalledWith({ message: 'Task not found.' });
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual({ message: 'Task not found.' });
     })
   })
 
-  // --- PATCH /api/todos/:id/toggle ---
   describe('PATCH /api/todos/:id/toggle', () => {
     it('should toggle task completion successfully', async () => {
       const updatedTask: TodoTask = { id: 'task-id-to-toggle', title: 'Task to toggle', completed: true, createdAt: new Date(), hasReminderActive: false };
       vi.spyOn(mockedTodoStore, 'toggleTaskCompletion').mockReturnValue(updatedTask);
-      const req = mockRequest({}, { id: 'task-id-to-toggle' });
-      const res = mockResponse();
-      // Força o TypeScript a ignorar a assinatura estrita do Router do Express
-      await (todosController as any).patch(req, res);
+      
+      const response = await request(app).patch('/api/todos/task-id-to-toggle/toggle')
+      
       expect(mockedTodoStore.toggleTaskCompletion).toHaveBeenCalledWith('task-id-to-toggle');
-      expect(res.json).toHaveBeenCalledWith(updatedTask);
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual({
+        ...updatedTask,
+        createdAt: updatedTask.createdAt.toISOString()
+      });
     })
 
     it('should return 404 if task is not found for toggling', async () => {
       vi.spyOn(mockedTodoStore, 'toggleTaskCompletion').mockReturnValue(undefined);
-      const req = mockRequest({}, { id: 'non-existent-id' });
-      const res = mockResponse();
-      // Força o TypeScript a ignorar a assinatura estrita do Router do Express
-      await (todosController as any).patch(req, res);
+      
+      const response = await request(app).patch('/api/todos/non-existent-id/toggle')
+      
       expect(mockedTodoStore.toggleTaskCompletion).toHaveBeenCalledWith('non-existent-id');
-      expect(res.status).toHaveBeenCalledWith(404);
-      expect(res.json).toHaveBeenCalledWith({ message: 'Task not found.' });
+      expect(response.status).toBe(404);
+      expect(response.body).toEqual({ message: 'Task not found.' });
     })
   })
-
 })
