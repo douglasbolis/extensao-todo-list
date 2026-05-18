@@ -1,2 +1,8 @@
-site_name: 'Todo-List MVC'
-theme: 'readthedocs'
+site_name: 'Documentação - Todo-List MVC'
+theme: 
+  name: 'readthedocs'
+nav:
+  - Início: index.md
+  - Arquitetura: arquitetura.md
+  - Back-end (API): backend.md
+  - Front-end (Web): frontend.md
