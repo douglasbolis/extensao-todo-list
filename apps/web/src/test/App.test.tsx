@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import App from '../App';
-import { vi } from 'vitest';
+import { vi, type Mocked } from 'vitest';
 import { api } from '../services/api';
 
 // Mock do axios (services/api)
@@ -13,7 +13,7 @@ vi.mock('../services/api', () => ({
   }
 }));
 
-const mockApi = api as vi.Mocked<typeof api>;
+const mockApi = api as Mocked<typeof api>;
 
 describe('App Component', () => {
   beforeEach(() => {
