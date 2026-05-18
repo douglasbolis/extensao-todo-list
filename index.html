@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="description" content="None" />
+      <link rel="shortcut icon" href="img/favicon.ico" />
+    <title>Documentação - Todo-List MVC</title>
+    <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "In\u00edcio";
+        var mkdocs_page_input_path = "index.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="." class="icon icon-home"> Documentação - Todo-List MVC
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href=".">Início</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#estrutura-do-monorepo">Estrutura do Monorepo</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#como-executar-localmente">Como Executar Localmente</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#scripts-uteis-na-raiz">Scripts Úteis na Raiz</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="arquitetura/">Arquitetura</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="backend/">Back-end (API)</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="frontend/">Front-end (Web)</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href=".">Documentação - Todo-List MVC</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Início</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="bem-vindo-ao-todo-list-mvc">Bem-vindo ao Todo-List MVC</h1>
+<p>Este é um projeto de gerenciamento de tarefas (Todo List) construído com base na arquitetura <strong>MVC</strong> (Model-View-Controller) utilizando uma estrutura de <strong>Monorepo</strong>.</p>
+<p>O objetivo do projeto é demonstrar uma separação clara de responsabilidades entre a interface de usuário (Front-end/View) e a lógica de negócios e persistência de dados (Back-end/Controller/Model).</p>
+<h2 id="estrutura-do-monorepo">Estrutura do Monorepo</h2>
+<p>O repositório está dividido em duas aplicações principais dentro da pasta <code>apps/</code>:</p>
+<ul>
+<li><strong><code>apps/api</code></strong>: Back-end desenvolvido em Node.js com Express e TypeScript. Atua como o <strong>Controller</strong> e o <strong>Model</strong> (armazenando dados em memória).</li>
+<li><strong><code>apps/web</code></strong>: Front-end desenvolvido em React com Vite e TailwindCSS. Atua como a <strong>View</strong>.</li>
+</ul>
+<p>Além disso, temos a pasta <code>docs/</code> que armazena esta documentação (feita no formato MkDocs).</p>
+<h2 id="como-executar-localmente">Como Executar Localmente</h2>
+<p>O projeto utiliza <code>npm workspaces</code> para gerenciar as dependências de forma centralizada.</p>
+<ol>
+<li>
+<p><strong>Instalação Geral:</strong>
+   Na raiz do projeto, execute:
+   <code>bash
+   npm install --legacy-peer-deps</code></p>
+</li>
+<li>
+<p><strong>Iniciando a API (Back-end):</strong>
+   <code>bash
+   npm run dev -w apps/api</code>
+   A API estará rodando em <code>http://localhost:3000/api</code></p>
+</li>
+<li>
+<p><strong>Iniciando a Web (Front-end):</strong>
+   <code>bash
+   npm run dev -w apps/web</code>
+   O Front-end estará disponível em <code>http://localhost:5173/</code> (ou outra porta livre indicada pelo Vite no terminal).</p>
+</li>
+</ol>
+<h2 id="scripts-uteis-na-raiz">Scripts Úteis na Raiz</h2>
+<ul>
+<li><code>npm run test --workspaces --if-present</code>: Executa as suítes de testes de todos os pacotes.</li>
+<li><code>npm run build --workspaces --if-present</code>: Faz o build (transpilação TypeScript, bundler do Vite) de todos os pacotes.</li>
+</ul>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="arquitetura/" class="btn btn-neutral float-right" title="Arquitetura">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+    
+      <span><a href="arquitetura/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = ".";</script>
+    <script src="js/theme_extra.js"></script>
+    <script src="js/theme.js"></script>
+      <script src="search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
+
+<!--
+MkDocs version : 1.5.3
+Build Date UTC : 2026-05-18 04:39:14.190416+00:00
+-->
