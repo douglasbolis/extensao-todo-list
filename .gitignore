@@ -46,3 +46,7 @@ Thumbs.db
 .eslintcache
 .vitest/
 coverage/
+
+# Arquivos de Configuração Específicos
+.gemini/
+.specify/
